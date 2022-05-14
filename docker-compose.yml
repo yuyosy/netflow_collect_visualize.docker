@@ -1,0 +1,44 @@
+version: "3.0"
+
+services:
+# Define InfluxDB
+  influxdb:
+    build: ./influxdb
+    hostname: influxdb
+    container_name: influxdb
+    ports: 
+      - "8083:8083"
+      - "8086:8086"
+      - "8090:8090"
+    volumes:
+      - influxdb2:/var/lib/influxdb2
+      - influxdb2etc:/etc/influxdb2
+   
+# Define grafana
+  grafana:
+    build: ./grafana
+    hostname: grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
+
+# Define Fluentd
+  fluentd:
+    build: ./fluentd
+    hostname: fluentd
+    container_name: fluentd
+    links:
+      - influxdb
+    ports:
+      - "24284:24284"
+      - "24284:24284/udp"
+      - "5140:5140"
+      - "5140:5140/udp"
+    depends_on:
+      - influxdb
+
+volumes:
+  influxdb2:
+  influxdb2etc:
